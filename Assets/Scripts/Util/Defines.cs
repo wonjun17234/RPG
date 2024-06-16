@@ -9,5 +9,13 @@ public class Defines
         None,
         Left = -1,
         Right = 1,
+        Up = 2,
+        Down = -2,
+    }
+
+    public enum UiEventType
+    {
+        PointDown,
+        PointUp,
     }
 }

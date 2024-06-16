@@ -33,7 +33,7 @@ public class Node
         }
     }
 
-    public void SetPieceInstance(List<GameObject> tm, DirType exitDir)
+    public void SetPieceInstance(List<GameObject> tm, DirType exitDir, bool isEnd = false)
     {
         _piece = Object.Instantiate<GameObject>(tm[UnityEngine.Random.Range(0, tm.Count)]);
         _piece.AddComponent<LevelPiece>();
@@ -42,6 +42,15 @@ public class Node
         if(EnterType == ExitType)
         {
             Debug.Log("Error");
+        }
+
+        if(isEnd)
+        {
+            GameObject go = new GameObject("FinishPoint");
+            go.AddComponent<BoxCollider2D>();
+            go.AddComponent<FinishPoint>();
+            go.transform.parent = _piece.transform;
+            go.transform.localPosition = new Vector3(2.5f, -2.5f, 0);
         }
     }
 

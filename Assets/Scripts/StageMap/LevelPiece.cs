@@ -38,9 +38,10 @@ public class LevelPiece : MonoBehaviour
 
             if(random == 0)
             {
+                int random2 = Random.Range(0, enemys.Count);
                 Vector3 vector3 = spawnable.transform.position;
-                vector3.y += 2f;
-                Instantiate<GameObject>(enemys[Random.Range(0, enemys.Count)], vector3, Quaternion.identity);
+                vector3.y += 2f + enemys[random2].GetComponent<EnemyController>().SpawnOffSet;
+                Instantiate<GameObject>(enemys[random2], vector3, Quaternion.identity);
             }
         }
     }

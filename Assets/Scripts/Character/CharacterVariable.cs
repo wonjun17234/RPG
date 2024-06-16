@@ -16,9 +16,16 @@ public class CharacterVariable : MonoBehaviour
     private float _maxhp = 100;
     public float Maxhp{
         get { return _maxhp; }
+        set 
+        { 
+            _maxhp = value; 
+        }
     }
     
-    
+    void Start()
+    {
+        _hp = _maxhp;
+    }
     public float Hp
     {
         get { return _hp; }

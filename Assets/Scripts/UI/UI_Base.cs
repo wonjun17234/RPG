@@ -5,23 +5,44 @@ using System.Linq;
 using System.Net.Http.Headers;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class UI_Base : MonoBehaviour
 {
-    Dictionary<Type, List<UnityEngine.Object>> _uiObjectDic = new Dictionary<Type, List<UnityEngine.Object>>(); 
+    Dictionary<Type, List<UnityEngine.Object>> _uiObjectDic = new Dictionary<Type, List<UnityEngine.Object>>();
 
-
-    // Start is called before the first frame update
-    void Start()
+    /// <summary>
+    /// UIObject에다가 action을 바인드 한다
+    /// </summary>
+    /// <param name="uiObject">
+    /// 바인드할 게임 오브젝트
+    /// </param>
+    /// <param name="uiEventType">
+    /// 바인드할 이벤트 타입
+    /// </param>
+    /// <param name="uiAction">
+    /// 바인드할 엑션
+    /// </param>
+    protected void BindFunctionToHandler(GameObject uiObject, Defines.UiEventType uiEventType, Action<PointerEventData> uiAction)
     {
-        
-    }
+        UI_EventHandler uIEventHandler = GetComponent<UI_EventHandler>();
+        if (uIEventHandler == null)
+        {
+            uIEventHandler = uiObject.AddComponent<UI_EventHandler>();
+        }
+        switch (uiEventType)
+        {
+            case Defines.UiEventType.PointDown:
+                uIEventHandler.OnDownAction -= uiAction;
+                uIEventHandler.OnDownAction += uiAction;
+                break;
+            case Defines.UiEventType.PointUp:
+                uIEventHandler.OnUpAction -= uiAction;
+                uIEventHandler.OnUpAction += uiAction;
+                break;
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     /// <summary>

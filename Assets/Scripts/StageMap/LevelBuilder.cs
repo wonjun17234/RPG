@@ -84,7 +84,7 @@ public class LevelBuilder : MonoBehaviour
             {
                 List<GameObject> list;
                 _endDictionary.TryGetValue(currentNode.EnterType, out list);
-                currentNode.SetPieceInstance(list, DirType.Down);
+                currentNode.SetPieceInstance(list, DirType.Down, true);
 
                 break;
             }
@@ -96,7 +96,6 @@ public class LevelBuilder : MonoBehaviour
                 if(_pieceDictionary.TryGetValue(newPieceType, out tm))
                 {
                     currentNode.SetPieceInstance(tm, newPieceType.exitDir);
-
                 }
             }
         }

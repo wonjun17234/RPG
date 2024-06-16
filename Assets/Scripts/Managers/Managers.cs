@@ -9,6 +9,8 @@ public class Managers : MonoBehaviour
 
     DataManager _dataManager = new DataManager();
 
+    
+
     public DataManager DataManager
     {
         get 

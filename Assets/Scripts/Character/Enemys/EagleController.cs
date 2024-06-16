@@ -21,9 +21,12 @@ public class EagleController : EnemyController
 
     float _speed;
 
+    bool _isAttackEnd = false;
+
     [SerializeField]
     int _groundLayer;
 
+   
     Defines.DirType _dirType;
     public EagleState CurrentState
     {
@@ -41,13 +44,47 @@ public class EagleController : EnemyController
                     break;
                 case EagleState.Move:
                     _animator.Play("Move");
-                    _dirType = (Defines.DirType)(Random.value > 0.5f ? 1 : -1);
-                    FlipCharacter((int)_dirType);
+                    int random = Random.Range(0, 4);
+                    switch (random)
+                    {
+                        case 0:
+                            _dirType = Defines.DirType.Left;
+                            break;
+                        case 1:
+                            _dirType = Defines.DirType.Up;
+                            break;
+                        case 2:
+                            _dirType = Defines.DirType.Down;
+                            
+                            break;
+                        case 3:
+                            _dirType = Defines.DirType.Right;
+                            break;
+                        default:
+                            _dirType = Defines.DirType.None;
+                            break;
+                    }
+                    
+                    RaycastHit2D hitDown = Physics2D.Raycast(transform.position, UnityEngine.Vector2.down, 5, _groundLayer);
+                    RaycastHit2D hitUp = Physics2D.Raycast(transform.position, UnityEngine.Vector2.up, 1, _groundLayer);
+
+                    if (hitDown.collider != null && hitUp.collider == null)
+                    {
+                        _dirType = Defines.DirType.Up;
+                    }
+
+
+                    if (_dirType == Defines.DirType.Left || _dirType == Defines.DirType.Right)
+                    {
+                        FlipCharacter(-(int)_dirType);
+                    }
+
                     time = 0;
                     StartCoroutine(WaitForIdle());
                     break;
                 case EagleState.DiveAttack:
                     _animator.Play("DiveAttack");
+                    StartCoroutine(DoAttack());
                     break;
                 case EagleState.Returning:
                     _animator.Play("Returning");
@@ -68,7 +105,37 @@ public class EagleController : EnemyController
     IEnumerator WaitForIdle()
     {
         yield return new WaitForSeconds(2);
-        CurrentState = EagleState.Idle;
+        
+        if(_dirType == Defines.DirType.Up)
+        {
+            CurrentState = EagleState.Move;
+        }
+        else
+        {
+            CurrentState = EagleState.Idle;
+        }
+
+    }
+
+    IEnumerator DoAttack()
+    {
+        Defines.DirType dirTypeToPlayer = _player.transform.position.x - transform.position.x > 0 ? Defines.DirType.Right : Defines.DirType.Left;
+        _isAttackEnd = false;
+
+        
+        FlipCharacter(-(int)dirTypeToPlayer);
+        
+
+        while (!_isAttackEnd)
+        {
+            transform.position += new Vector3((int)dirTypeToPlayer * Time.deltaTime * 4, -1 * Time.deltaTime * 4, 0);
+            
+            yield return null;
+        }
+
+        CurrentState = EagleState.Move;
+
+
     }
     protected override void Start()
     {
@@ -78,7 +145,7 @@ public class EagleController : EnemyController
         
         CurrentState = EagleState.Idle;
         time = 0;
-        _speed = 1;
+        _speed = 2;
     }
 
     // Update is called once per frame
@@ -98,47 +165,51 @@ public class EagleController : EnemyController
     void OnIdle()
     {
         DetectPlayer();
+        if(_player != null)
+        {
+            CurrentState = EagleState.DiveAttack;
+        }
     }
 
     void OnMove()
     {
-        SetY();
-        SetX();
-
-    }
-
-    void SetY()
-    {
-        time += Time.deltaTime;
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 100, _groundLayer);
-        if(hit.collider != null)
-        {
-            Vector3 vector3 = transform.position;
-            vector3.y = Mathf.Lerp(transform.position.y, hit.transform.position.y + 4f, time / (transform.position.y - hit.transform.position.y));
-            transform.position = vector3;
-        }
-        else
-        {
-            Debug.Log("hit null");
-        }
+        DoMove(_dirType);
+        DetectPlayer();
         
+        if (_player != null && _dirType != Defines.DirType.Up)
+        {
+            CurrentState = EagleState.DiveAttack;
+        }
     }
-    void SetX()
+
+    void DoMove(Defines.DirType dirType)
     {
-        if(_player != null)
+        UnityEngine.Vector3 vector3;
+
+        switch (dirType)
         {
-            if ((_player.transform.position - transform.position).x > 0)
-            {
-                transform.position =  transform.position + new Vector3(_speed * Time.deltaTime, 0, 0);
-            }
-            else
-            {
-                transform.position = transform.position + new Vector3(-_speed * Time.deltaTime, 0, 0);
-            }
+            case Defines.DirType.Left:
+                vector3 = UnityEngine.Vector2.left;
+                break;
+            case Defines.DirType.Right:
+                vector3 = UnityEngine.Vector2.right;
+                break;
+            case Defines.DirType.Up:
+                vector3 = UnityEngine.Vector2.up;
+                break;
+            case Defines.DirType.Down:
+                vector3 = UnityEngine.Vector2.down;
+                break;
+            default :
+                vector3 = UnityEngine.Vector2.zero;
+                break;
         }
-        else
-        {
-            transform.position = transform.position + new Vector3(-_speed * Time.deltaTime * (int)_dirType, 0, 0);
-        }
+
+        transform.position = transform.position + vector3 * Time.deltaTime;
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        _isAttackEnd = true;
     }
 }

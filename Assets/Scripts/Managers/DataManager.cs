@@ -19,4 +19,17 @@ public class DataManager
             return _enemys; 
         }
     }
+
+    public int Coin
+    {
+        get { return PlayerPrefs.GetInt("Coin"); }
+        set { PlayerPrefs.SetInt("Coin", value); }
+    }
+
+    public float MaxHp
+    {
+        get { return PlayerPrefs.GetFloat("MaxHp", 100f); }
+        set { PlayerPrefs.SetFloat("MaxHp", value); }
+    }
+
 }

@@ -65,6 +65,8 @@ public class PlayerController : CharacterController
 
         _characterVariable.OnDeadAction -= OnHpZero;
         _characterVariable.OnDeadAction += OnHpZero;
+
+        _characterVariable.Maxhp = Managers.Instance.DataManager.MaxHp;
     }
 
     // Update is called once per frame

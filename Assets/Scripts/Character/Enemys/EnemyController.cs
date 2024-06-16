@@ -9,6 +9,14 @@ public class EnemyController : CharacterController
     protected GameObject _player;
     [SerializeField]
     protected float _radius = 3;
+
+    [SerializeField]
+    protected float _spawnOffSet = 0;
+
+    public float SpawnOffSet{
+        get{ return _spawnOffSet; }
+    }
+
     protected void DetectPlayer()
     {
         Collider2D[] collider2Ds = Physics2D.OverlapCircleAll(transform.position, _radius);
